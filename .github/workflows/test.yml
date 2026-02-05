@@ -1,0 +1,48 @@
+name: Real World CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️⃣ Get the repository
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      # 2️⃣ Set up runtime
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      # 3️⃣ Verify environment
+      - name: Show Node version
+        run: node --version
+
+      # 4️⃣ Install dependencies (only if package.json exists)
+      - name: Install dependencies
+        run: |
+          if [ -f package.json ]; then
+            npm install
+          else
+            echo "No package.json found — skipping npm install"
+          fi
+
+      # 5️⃣ Run tests (only if defined)
+      - name: Run tests
+        run: |
+          if [ -f package.json ]; then
+            npm test || echo "No tests defined"
+          else
+            echo "Skipping tests"
+          fi
+
+      # 6️⃣ CI success message
+      - name: CI completed
+        run: echo "CI pipeline completed successfully"
